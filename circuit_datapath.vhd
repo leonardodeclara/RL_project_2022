@@ -15,7 +15,7 @@ entity datapath is
            r2_load : in STD_LOGIC;
            r3_load : in STD_LOGIC;
            r4_load : in STD_LOGIC;
-           r5_load : in STD_LOGIC:
+           r5_load : in STD_LOGIC;
            r1_sel : in STD_LOGIC;
            o_r2_sel : in STD_LOGIC_VECTOR (2 downto 0);
            r3_sel : in STD_LOGIC;
@@ -34,7 +34,7 @@ signal o_reg4 : STD_LOGIC_VECTOR (15 downto 0);
 signal o_reg5 : STD_LOGIC_VECTOR (15 downto 0);
 signal mux_reg1 : STD_LOGIC_VECTOR(7 downto 0);
 signal sub_reg1 : STD_LOGIC_VECTOR(7 downto 0);
-signal mux_o_reg2 : STD_LOGIC_VECTOR(7 downto 0);
+--signal mux_o_reg2 : STD_LOGIC_VECTOR(7 downto 0); coincide con o_reg2
 signal i_conv : STD_LOGIC;
 signal o_conv : STD_LOGIC_VECTOR(1 downto 0);
 signal sum_conv:  STD_LOGIC_VECTOR(7 downto 0);
@@ -52,9 +52,9 @@ signal conv_cur_state, conv_next_state : C;
 begin
 
     with r1_sel select 
-        mux_reg1 <= i_data when '0'
+        mux_reg1 <= i_data when '0',
                     sub_reg1 when '1',
-        		    "XXXXXXXXXXXXXXXX" when others;
+        		    "XXXXXXXX" when others;
 
     r1: process(i_clk, i_rst)
     begin
@@ -91,7 +91,7 @@ begin
                   o_reg2(5) when "101",
                   o_reg2(6) when "110",
                   o_reg2(7) when "111",
-                  "X" when others;
+                  'X' when others;
 
 
     conv_state: process(i_clk, conv_rst)
@@ -99,7 +99,7 @@ begin
         if(conv_rst = '1') then
             conv_cur_state <= C0;
         elsif i_clk'event and i_clk = '1' then
-            conv_cur_state <= next_state;
+            conv_cur_state <= conv_next_state;
         end if;
     end process;
 
@@ -112,15 +112,15 @@ begin
                 if i_conv = '1' then
                     conv_next_state <= C2;
                     o_conv <= "11";
-                else if i_conv = '0' then
+                elsif i_conv = '0' then
                     conv_next_state <= C0;
                     o_conv <= "00";
                 end if;
             when C1 =>
                 if i_conv = '1' then
                     conv_next_state <= C2;
-                    o_conv <= "00"
-                else if i_conv = '0' then
+                    o_conv <= "00";
+                elsif i_conv = '0' then
                     conv_next_state <= C0;
                     o_conv <= "11";
                 end if;
@@ -128,7 +128,7 @@ begin
                 if i_conv = '1' then
                     conv_next_state <= C3;
                     o_conv <= "10";
-                else if i_conv = '0' then
+                elsif i_conv = '0' then
                     conv_next_state <= C1;
                     o_conv <= "01";
                 end if;
@@ -136,15 +136,15 @@ begin
                 if i_conv = '1' then
                     conv_next_state <= C3;
                     o_conv <= "01";
-                else if i_conv = '0' then
+                elsif i_conv = '0' then
                     conv_next_state <= C1;
                     o_conv <= "10";
                 end if;
         end case;
-    end process
+    end process;
 
     -- non so se va bene l'and con i due bit dell'output del conv fatto così)--
-    sum_conv <= ("000000" & o_conv) + mux_sum_conv;
+    sum_conv <= ("000000" & o_conv)+ mux_sum_conv;
     
     with d_sel select
         mux_sum_conv <= "00000000" when '0',
@@ -165,7 +165,7 @@ begin
 
     -- non sono sicuro su queste due istruzioni, se vadano da qualche altra parte--
     o_data <= o_reg3;
-    o_sll <= "o_reg3 & "00";
+    o_sll <= o_reg3(5 downto 0) & "00" ;
     
     with r4_sel select
         mux_reg4 <= i_addr when '0',
@@ -186,7 +186,7 @@ begin
     sum_reg4 <= o_reg4 + "0000000000000001";
 
     with r5_sel select
-        mux_reg4 <= wr_addr when '0',
+        mux_reg5 <= wr_addr when '0',
                     sum_reg5 when '1',
                     "XXXXXXXXXXXXXXXX" when others;
 
@@ -195,7 +195,7 @@ begin
         if(i_rst = '1') then
             o_reg5 <= "0000000000000000";
         elsif i_clk'event and i_clk = '1' then
-            if(r4_load = '1') then
+            if(r5_load = '1') then
                 o_reg5 <= mux_reg5;
             end if;
         end if;
@@ -205,7 +205,7 @@ begin
 
     with mem_sel select
         o_address <= o_reg4 when '0',
-                  o_reg5 when '1',
-                  "XXXXXXXXXXXXXXXX" when others;
+                    o_reg5 when '1',
+                    "XXXXXXXXXXXXXXXX" when others;
 
 end Behavioral;
