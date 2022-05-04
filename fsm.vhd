@@ -174,8 +174,9 @@ begin
         r5_sel <= '0';
         d_sel <= '0';
         mem_sel <= '0';
+        conv_rst <= '0'; --vedere se è questo che genera un latch
 
-        wr_addr <= "1111101000000000";
+        wr_addr <= "0000001111101000";
         i_addr <= "0000000000000000";
         o_en <= '0';
         o_we <= '0';
@@ -184,7 +185,7 @@ begin
             when S0 =>
             when S1 =>
                 i_addr <= "0000000000000000";
-                wr_addr <= "1111101000000000";
+                wr_addr <= "0000001111101000";
                 r4_sel <= '0';
                 r4_load <= '1';
                 r5_sel <= '0';
