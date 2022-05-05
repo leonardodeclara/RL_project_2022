@@ -2,6 +2,7 @@
 \usepackage[T1]{fontenc} 
 \usepackage[utf8]{inputenc} 
 \usepackage[italian]{babel}
+\usepackage{graphicx}
 
 \begin{document}
 
@@ -25,15 +26,78 @@ Docente: & William Fornaciari	 % Instructor/supervisor
 
 \section{Introduzione}
 \subsection{Descrizione Del Progetto}
+La Prova Finale di Reti Logiche 2022 consiste nell'implementazione di un modulo hardware descritto in VHDL in grado di ricevere in ingresso una sequenza continue di parole di 8 bit su cui viene applicato il codice convoluzionale \begin{math}\frac{1}{2} \end{math}, restituito successivamente in uscita come una sequenza di parole di 8 bit.
+\newline
+In particolare, ogni parola in ingresso viene serializzata, generando in questo modo un flusso continuo di 1 bit. Il convolutore dunque produce in uscita un flusso continuo ottenuto come concatenamento dei due bit, il quale verrà quindi memorizzato in memoria in parole da 8 bit.
+\newline 
+Il codificatore convoluzionale è una macchina sequenziale sincrona con clock globale e segnale di reset descritto dal seguente diagramma degli stati.
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale = 0.30]{convolutore.png}
+\end{figure} 
+
+Al componente viene richiesto di comunicare con la memoria con indirizzamento al byte per leggere il numero di parole da elaborare, registrato all'indirizzo 0, il contenuto della sequenza in ingresso, memorizzata a partire dall'indirizzo 1, e per scrivere la sequenza in uscita a partire dall'indirizzo 1000.
+\newline
+
+Esempio di codifica, magari con un disegnino
+\newline
+
+
+Il modulo è stato progettato per poter codificare più flussi in ingresso: tra un'elaborazione e la successiva il codificatore convoluzionale verrà riportato nel suo stato iniziale, la quantità di parole si troverà all'indirizzo 0 e la scrittura avverrà a partire dell'indirizzo 1000. 
+\newline
+
+Per la realizzazione del progetto è stata utilizzato lo strumento di sintesi Xilinx Vivado Webpack e la FPGA  xc7a200tfbg484-1.
+
 \subsection{Scelte Progettuali}
 
 \newpage
 \section{Architettura}
+\subsection{Descrizione ad alto livello}
+Per la progettazione del componente si è scelto di utilizzare un'architettura modulare costituita da un modulo dedicato all'unità di elaborazione, Data Path, e un modulo dedicato all'unità di controllo, la FSM. 
+\newline
+L'implementazione esegue i seguenti passi:
+\begin{enumerate}
+	\item Lettura del primo indirizzo di memoria e memorizzazione in un registro del numero di parole da elaborare. 
+	\item Lettura del secondo indirizzo e memorizzazione in un registro della parola a cui sarà applicato il codice convoluzionale.
+	\item Selezione e conversione dei primi quattro bit della parola corrente.
+	\item Scrittura in memoria della parola generata a partire dai primi quattro bit della parola corrente.
+	\item Selezione e conversione dei quattri bit rimanenti della parola corrente.
+	\item Scrittura in memoria della parola generata a partire dai rimanenti quattro bit della parola corrente.
+	\item Se sono ancora presenti in memoria parole da convertire vengono ripetuti i passaggi dal 2 in poi. 
+	\item Aggiornamento dei segnali di terminazione 
+\end{enumerate}
+
 \subsection{Data Path}
+Il componente Data Path è realizzato attraverso una collezione di process che si occupano di controllare, attraverso opportuni segnali, il corretto caricamento ed aggiornamento dei valori nei rispetti registri. Il suo funzionamento può essere diviso in tre moduli logici dedicati a specifiche operazioni:
+\begin{enumerate}
+	\item Aggiornamento numero di parole da convertire
+	\item Gestione indirizzi di lettura e scrittura
+	\item Selezione e conversione della sequenza in ingresso 
+\end{enumerate}
+
+\subsubsection{Calcolo numero di parole da convertire/ rivedere titolo}
+Questo modulo è composto da un registro 	\texttt{reg1} contenente il numero residuo di parole da convertire. Il contenuto in ingresso al registro viene selezionato da un multiplexer comandato dal segnale \texttt{r1\_sel}, il quale permette di trasmettere il valore proveniente dalla memoria attraverso \texttt{i\_data} oppure il contenuto di \texttt{reg1} decrementato di 1 attraverso un sottrattore collegato in uscita al registro. Il contenuto del registro in questione viene dato in ingresso ad un comparatore, il quale trasmette il segnale \texttt{o\_end=1} nel caso il valore in uscita da \texttt{reg1} fosse pari a 0, \texttt{o\_end=0} altrimenti.
+\newline
+
+Qui ci metto lo schema di questa parte del datapath
+\newline
+
+\subsubsection{Gestione indirizzi}
+Gli indirizzi di lettura e scrittura sono memorizzati nei registri \texttt{reg4} e \texttt{reg5}. Il contenuto di ciascun registro viene selezionato dai multiplexer comandati rispettivamente da \texttt{r4\_sel} e \texttt{r5\_sel}: il primo multiplexer riceve in ingresso \texttt{i\_addr}, pari a 0 su 16 bit, e il valore trasmesso in uscita da un sommatore collegato all'uscita di \texttt{reg4}, pari al valore del registro incrementato di 1; il secondo si occupa di selezionare un ingresso tra \texttt{wr\_addr}, pari a 1000 su 16 bit, e il valore in uscita da un sommatore collegato all'uscita di \texttt{reg5}, pari al valore del registro incrementato di 1. I valori memorizzati nei due registri costituiscono inoltre gli ingressi del multiplexer comandato dal segnale \texttt{mem\_sel}, il quale si occupa di trasmettere il valore di \texttt{o\_address}, contenente l'indirizzo di memoria su cui scriverà o leggerà il componente.
+\newline
+
+Qui ci metto lo schema di questa parte del datapath
+\newline
+
+\subsubsection{Conversione}
+La gestione delle sequenze in ingresso con conseguente generazione dei valori in uscita è assegnata ad un modulo contenente la macchina a stati che descrive il codificatore convoluzionale. Il modulo riceve una parola da 8 bit dalla memoria attraverso il segnale \texttt{i\_data}, il cui contenuto viene salvato nel registro \texttt{reg\_2}. I singoli 8 bit salvati costituiscono gli indirizzi ad un multiplexer che, attraverso il segnale di selezione a 3 bit \texttt{o\_r2\_sel} restituisce in uscita al codificatore..
+
 \subsection{Macchina a Stati Finiti}
 
 \newpage
 \section{Sintesi}
+\subsection{Report di timing}
+\subsection{Report di utilizzo}
 
 \newpage
 \section{Testing}
