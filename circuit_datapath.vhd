@@ -5,6 +5,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity datapath is
     Port ( i_clk : in STD_LOGIC;
            i_rst : in STD_LOGIC;
+           i_start : in STD_LOGIC;
            conv_rst : in STD_LOGIC;
            i_data : in STD_LOGIC_VECTOR (7 downto 0);
            i_addr : in STD_LOGIC_VECTOR (15 downto 0);
@@ -18,7 +19,6 @@ entity datapath is
            r5_load : in STD_LOGIC;
            r1_sel : in STD_LOGIC;
            o_r2_sel : in STD_LOGIC_VECTOR (2 downto 0);
-           r3_sel : in STD_LOGIC;
            r4_sel : in STD_LOGIC;
            r5_sel : in STD_LOGIC;
            d_sel : in STD_LOGIC;
@@ -34,7 +34,6 @@ signal o_reg4 : STD_LOGIC_VECTOR (15 downto 0);
 signal o_reg5 : STD_LOGIC_VECTOR (15 downto 0);
 signal mux_reg1 : STD_LOGIC_VECTOR(7 downto 0);
 signal sub_reg1 : STD_LOGIC_VECTOR(7 downto 0);
---signal mux_o_reg2 : STD_LOGIC_VECTOR(7 downto 0); coincide con o_reg2
 signal i_conv : STD_LOGIC;
 signal o_conv : STD_LOGIC_VECTOR(1 downto 0);
 signal sum_conv:  STD_LOGIC_VECTOR(7 downto 0);
@@ -71,9 +70,9 @@ begin
     
     o_end <= '1' when (o_reg1 = "00000000") else '0';
     
-    r2: process(i_clk, i_rst)
+    r2: process(i_clk, i_rst, i_start)
     begin
-        if(i_rst = '1') then
+        if(i_rst = '1' or i_start='0') then
             o_reg2 <= "00000000";
         elsif i_clk'event and i_clk = '1' then
             if(r2_load = '1') then
@@ -104,7 +103,7 @@ begin
     end process;
 
     -- o_conv non ci va nella sensitivity list
-    conv_lambda: process (conv_cur_state, i_conv, o_conv)
+    conv_lambda: process (conv_cur_state, i_conv)
     begin
         conv_next_state <= conv_cur_state;
         case conv_cur_state is

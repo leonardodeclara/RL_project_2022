@@ -20,6 +20,7 @@ component datapath is
     Port ( 
         i_clk : in STD_LOGIC;
         i_rst : in STD_LOGIC;
+        i_start: in STD_LOGIC;
         conv_rst : in STD_LOGIC;
         i_data : in STD_LOGIC_VECTOR (7 downto 0);
         i_addr : in STD_LOGIC_VECTOR (15 downto 0);
@@ -33,7 +34,6 @@ component datapath is
         r5_load : in STD_LOGIC;
         r1_sel : in STD_LOGIC;
         o_r2_sel : in STD_LOGIC_VECTOR (2 downto 0);
-        r3_sel : in STD_LOGIC;
         r4_sel : in STD_LOGIC;
         r5_sel : in STD_LOGIC;
         d_sel : in STD_LOGIC;
@@ -50,7 +50,6 @@ signal r4_load : STD_LOGIC;
 signal r5_load : STD_LOGIC;
 signal r1_sel : STD_LOGIC;
 signal o_r2_sel : STD_LOGIC_VECTOR(2 downto 0);
-signal r3_sel : STD_LOGIC;
 signal r4_sel : STD_LOGIC;
 signal r5_sel : STD_LOGIC;
 signal d_sel : STD_LOGIC;
@@ -69,6 +68,7 @@ begin
     DATAPATH0: datapath port map(
         i_clk,
         i_rst,
+        i_start,
         conv_rst,
         i_data,
         i_addr,
@@ -82,7 +82,6 @@ begin
         r5_load,
         r1_sel,
         o_r2_sel,
-        r3_sel,
         r4_sel,
         r5_sel,
         d_sel,
@@ -169,13 +168,11 @@ begin
         r5_load <= '0';
         r1_sel <= '0';
         o_r2_sel <= "000";
-        r3_sel <= '0';
         r4_sel <= '0';
         r5_sel <= '0';
         d_sel <= '0';
         mem_sel <= '0';
-        conv_rst <= '0'; --vedere se è questo che genera un latch
-
+        conv_rst <= '0'; 
         wr_addr <= "0000001111101000";
         i_addr <= "0000000000000000";
         o_en <= '0';
