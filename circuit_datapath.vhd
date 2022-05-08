@@ -55,9 +55,9 @@ begin
                     sub_reg1 when '1',
         		    "XXXXXXXX" when others;
 
-    r1: process(i_clk, i_rst)
+    r1: process(i_clk, i_rst, i_start)
     begin
-        if(i_rst = '1') then
+        if(i_rst = '1' or i_start='0') then
             o_reg1 <= "00000000";
         elsif i_clk'event and i_clk = '1' then
             if(r1_load = '1') then
@@ -153,7 +153,7 @@ begin
     
     r3: process(i_clk, i_rst)
     begin
-        if(i_rst = '1') then
+        if(i_rst = '1' or i_start='0') then
             o_reg3 <= "00000000";
         elsif i_clk'event and i_clk = '1' then
             if(r3_load = '1') then
@@ -173,7 +173,7 @@ begin
 
     r4: process(i_clk, i_rst)
     begin
-        if(i_rst = '1') then
+        if(i_rst = '1' or i_start='0') then
             o_reg4 <= "0000000000000000";
         elsif i_clk'event and i_clk = '1' then
             if(r4_load = '1') then
@@ -191,7 +191,7 @@ begin
 
     r5: process(i_clk, i_rst)
     begin
-        if(i_rst = '1') then
+        if(i_rst = '1' or i_start='0') then
             o_reg5 <= "0000000000000000";
         elsif i_clk'event and i_clk = '1' then
             if(r5_load = '1') then
