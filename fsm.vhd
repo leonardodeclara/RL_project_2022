@@ -115,7 +115,7 @@ begin
             when WAIT_WORDS_NUM =>
                 next_state <= WAIT_WORD;
             when WAIT_WORD =>
-                next_state <= WAIT_WORD;
+                next_state <= SET_WORD;
             when SET_WORD =>
                 if o_end='0' then
                     next_state <= CONV_1;
