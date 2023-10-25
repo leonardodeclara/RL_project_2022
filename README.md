@@ -10,7 +10,10 @@ Project for Digital Logic (Reti Logiche) course 2021/22 at Politecnico di Milano
 
 This project aims at the implementation of an HW module described in VHDL which interfaces with memory and follows the following specification: the module takes in a continuous sequence of W words, each consisting of 8 bits, and outputs a continuous sequence of Z words, each consisting of 8 bits. Each input word is serialized, creating a continuous 1-bit stream, denoted as U. The 1-bit stream U undergoes 1/2 convolutional coding, where each bit is encoded with 2 bits. This operation results in an output stream Y, which is obtained by alternating the concatenation of the two output bits.
 
-<img src="FSM_encoder.png" style="width:210px;height:130px;margin-left: 10px;" align="right">
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <img src="FSM_encoder.png" style="width:310px; height:130px;" />
+</div>
+
 
 
 ### Tools
