@@ -1,6 +1,6 @@
 # Digital Logic Design project 2021/2022
 
-Project for Digital Logic (Reti Logiche) course 2021/22 at Politecnico di Milano.
+Digital Logic (<em>Reti Logiche</em>) course project 2021/22 at Politecnico di Milano.
 
 **Professor**:  William Forniciari <br>
 
